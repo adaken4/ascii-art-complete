@@ -17,12 +17,12 @@ func main() {
 		return
 	}
 
-	// Generate ASCII art
-	artText, err := ascii.ArtStringBuilder(args[0], "./banners/"+args[1]+".txt")
+	runeAsciiArtMap, err := ascii.RuneAsciiArtMapCreator("./banners/" + args[1] + ".txt")
 	if err != nil {
-		fmt.Println(err)
-		return
+		os.Stderr.WriteString(err.Error())
 	}
+
+	artText := ascii.ArtStringBuilder(args[0], runeAsciiArtMap)
 
 	// Print the ASCII art
 	fmt.Print(artText)

@@ -6,6 +6,7 @@ import (
 
 	"asciiart/ascii"
 	"asciiart/flags"
+	"asciiart/justify"
 )
 
 func main() {
@@ -14,11 +15,12 @@ func main() {
 
 	runeAsciiArtMap, err := ascii.RuneAsciiArtMapCreator("./banners/" + options.Banner + ".txt")
 	if err != nil {
-		os.Stderr.WriteString(err.Error())
+		os.Stderr.WriteString(err.Error() + "\n")
+		os.Exit(1)
 	}
 
 	artText := ascii.ArtStringBuilder(options.Input, runeAsciiArtMap)
+	artText = justify.ArtAligner(options.Align, artText)
 
-	// Print the ASCII art
 	fmt.Print(artText)
 }

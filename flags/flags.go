@@ -7,6 +7,7 @@ import (
 type Options struct {
 	Color     string
 	Output    string
+	Align     string
 	Substring string
 	Input     string
 	Banner    string
@@ -16,6 +17,7 @@ func ParseOptions() Options {
 	var options Options
 	flag.StringVar(&options.Color, "color", "", "Usage: --color=<color>")
 	flag.StringVar(&options.Output, "output", "", "Usage: --ouput=<file.txt>")
+	flag.StringVar(&options.Align, "align", "", "Usage: --align=<position>")
 	flag.Parse()
 
 	switch len(flag.Args()) {

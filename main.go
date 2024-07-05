@@ -13,7 +13,11 @@ import (
 func main() {
 
 	// Get terminal flag options and arguments
-	options := flags.ParseOptions()
+	options, err := flags.ParseOptions()
+	if err != nil {
+		os.Stderr.WriteString(err.Error() + "\n")
+		os.Exit(1)
+	}
 
 	// Set the default banner file
 	if options.Banner == "" {

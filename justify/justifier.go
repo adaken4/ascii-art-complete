@@ -7,12 +7,18 @@ import (
 	"strings"
 )
 
-func ArtAligner(position, artText string) string {
+func ArtAligner(position, artText string) (string, error) {
+
+	if position == "left" {
+		return artText, nil
+	}
 
 	var result strings.Builder
 
-	terminalWidth, _ := getTerminalWidth()
-
+	terminalWidth, err := getTerminalWidth()
+	if err != nil {
+		return "", err
+	}
 	// Split artText into lines
 	lines := strings.Split(artText, "\n")
 
@@ -33,7 +39,7 @@ func ArtAligner(position, artText string) string {
 		paddedLines = append(paddedLines, paddedLine)
 	}
 
-	// Print each padded line and ensure the prompt is not padded
+	// Write each padded line and ensure the prompt is not padded
 	for i, paddedLine := range paddedLines {
 		if i == len(paddedLines)-1 {
 			result.WriteString("")
@@ -41,7 +47,7 @@ func ArtAligner(position, artText string) string {
 			result.WriteString(paddedLine + "\n")
 		}
 	}
-	return result.String()
+	return result.String(), nil
 }
 
 func getTerminalWidth() (int, error) {

@@ -32,7 +32,7 @@ func main() {
 	}
 
 	// Build art representation of the input text
-	artText := ascii.ArtStringBuilder(options.Input, runeAsciiArtMap)
+	artText := ascii.ArtStringBuilder(options.Input, options.Substring, options.Color, runeAsciiArtMap)
 
 	// Align art representation if specified
 	if options.Align != "" {

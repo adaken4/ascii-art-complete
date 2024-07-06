@@ -31,8 +31,20 @@ func main() {
 		os.Exit(1)
 	}
 
+	// Define parameters for Ascii art retrieval
+	params := ascii.ArtParams{
+		InputText:   options.Input,
+		SubString:   options.Substring,
+		Colour:      options.Color,
+		AsciiArtMap: runeAsciiArtMap,
+	}
+
 	// Build art representation of the input text
-	artText := ascii.ArtStringBuilder(options.Input, options.Substring, options.Color, runeAsciiArtMap)
+	artText, err := ascii.ArtStringBuilder(params)
+	if err != nil {
+		os.Stderr.WriteString(err.Error() + "\n")
+		os.Exit(1)
+	}
 
 	// Align art representation if specified
 	if options.Align != "" {

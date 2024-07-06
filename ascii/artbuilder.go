@@ -7,33 +7,46 @@ import (
 	"asciiart/color"
 )
 
-// ArtStringBuilder generates ASCII art for a given string using a specified banner file.
-func ArtStringBuilder(inputText, subString, colour string, asciiArtMap map[rune]string) string {
+type ArtParams struct {
+	InputText   string
+	SubString   string
+	Colour      string
+	AsciiArtMap map[rune]string
+}
 
-	// Create a strings.Builder to build the ASCII art string
+// ArtStringBuilder generates ASCII art for a given string using a specified banner file.
+func ArtStringBuilder(params ArtParams) (string, error) {
 	var result strings.Builder
 	newlines := regexp.MustCompile(`\\n`)
-	inputText = newlines.ReplaceAllString(inputText, "\n")
+	params.InputText = newlines.ReplaceAllString(params.InputText, "\n")
 
 	// Handle newlines accordingly, if input text contains only newlines
-	if onlyNewLines(inputText) {
-		result.WriteString(inputText)
-		return result.String()
+	if onlyNewLines(params.InputText) {
+		result.WriteString(params.InputText)
+		return result.String(), nil
 	}
 
-	inputSlices := strings.Split(inputText, "\n")
+	inputSlices := strings.Split(params.InputText, "\n")
 
 	for _, v := range inputSlices {
 		if v == "" {
 			result.WriteString("\n")
 		} else {
-			artString := StringBuilder(v, subString, colour, asciiArtMap)
+			artString, err := StringBuilder(ArtParams{
+				InputText:   v,
+				SubString:   params.SubString,
+				Colour:      params.Colour,
+				AsciiArtMap: params.AsciiArtMap,
+			})
+			if err != nil {
+				return "", err
+			}
 			result.WriteString(artString)
 		}
 	}
 
 	// Return the generated ASCII art string
-	return result.String()
+	return result.String(), nil
 }
 
 // onlyNewLines checks if a string contains only newline runes
@@ -47,21 +60,29 @@ func onlyNewLines(s string) bool {
 }
 
 // StringBuilder builds the ASCII art string from input text, colorizing substrings if specified.
-func StringBuilder(inputText, subString, colour string, asciiArtMap map[rune]string) string {
+func StringBuilder(params ArtParams) (string, error) {
 	var result strings.Builder
 
 	for i := 0; i < 8; i++ {
 		start := 0
 
-		for start < len(inputText) {
-			if subString == "" {
-				result.WriteString(processNormal(inputText, colour, asciiArtMap, i))
+		for start < len(params.InputText) {
+			if params.SubString == "" {
+				normalString, err := processNormal(params, i)
+				if err != nil {
+					return "", err
+				}
+				result.WriteString(normalString)
 				break
-			} else if strings.HasPrefix(inputText[start:], subString) {
-				result.WriteString(colorizeSubstring(subString, colour, asciiArtMap, i))
-				start += len(subString)
+			} else if strings.HasPrefix(params.InputText[start:], params.SubString) {
+				coloredSubstring, err := colorizeSubstring(params, i)
+				if err != nil {
+					return "", err
+				}
+				result.WriteString(coloredSubstring)
+				start += len(params.SubString)
 			} else {
-				result.WriteString(processCharacter(rune(inputText[start]), asciiArtMap, i))
+				result.WriteString(processCharacter(rune(params.InputText[start]), params.AsciiArtMap, i))
 				start++
 			}
 		}
@@ -69,33 +90,39 @@ func StringBuilder(inputText, subString, colour string, asciiArtMap map[rune]str
 		result.WriteString("\n")
 	}
 
-	return result.String()
+	return result.String(), nil
 }
 
 // processNormal processes the input text normally, optionally colorizing each character.
-func processNormal(inputText, colour string, asciiArtMap map[rune]string, lineIndex int) string {
+func processNormal(params ArtParams, lineIndex int) (string, error) {
 	var result strings.Builder
-	for _, v := range inputText {
-		artLines := strings.Split(asciiArtMap[v], "\n")
-		if colour != "" {
-			ansiCode, _ := color.SetColor(colour)
+	for _, v := range params.InputText {
+		artLines := strings.Split(params.AsciiArtMap[v], "\n")
+		if params.Colour != "" {
+			ansiCode, err := color.SetColor(params.Colour)
+			if err != nil {
+				return "", err
+			}
 			result.WriteString(color.Colorize(ansiCode, artLines[lineIndex]))
 		} else {
 			result.WriteString(artLines[lineIndex])
 		}
 	}
-	return result.String()
+	return result.String(), nil
 }
 
 // colorizeSubstring colorizes the specified substring.
-func colorizeSubstring(subString, colour string, asciiArtMap map[rune]string, lineIndex int) string {
+func colorizeSubstring(params ArtParams, lineIndex int) (string, error) {
 	var result strings.Builder
-	for _, v := range subString {
-		artLines := strings.Split(asciiArtMap[v], "\n")
-		ansiCode, _ := color.SetColor(colour)
+	for _, v := range params.SubString {
+		artLines := strings.Split(params.AsciiArtMap[v], "\n")
+		ansiCode, err := color.SetColor(params.Colour)
+		if err != nil {
+			return "", err
+		}
 		result.WriteString(color.Colorize(ansiCode, artLines[lineIndex]))
 	}
-	return result.String()
+	return result.String(), nil
 }
 
 // processCharacter processes a single character, adding its ASCII art lines.

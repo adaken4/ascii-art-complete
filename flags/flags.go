@@ -27,8 +27,19 @@ func ParseOptions() (Options, error) {
 	case 1:
 		options.Input = flag.Arg(0)
 	case 2:
-		options.Input = flag.Arg(0)
-		options.Banner = flag.Arg(1)
+		validBanners := map[string]bool{
+			"thinkertoy": true,
+			"rounded":    true,
+			"shadow":     true,
+			"standard":   true,
+		}
+		if validBanners[flag.Arg(1)] {
+			options.Input = flag.Arg(0)
+			options.Banner = flag.Arg(1)
+		} else {
+			options.Substring = flag.Arg(0)
+			options.Input = flag.Arg(1)
+		}
 	case 3:
 		options.Substring = flag.Arg(0)
 		options.Input = flag.Arg(1)

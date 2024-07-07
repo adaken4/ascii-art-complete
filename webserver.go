@@ -1,21 +1,25 @@
 package main
 
 import (
-	"asciiart/ascii"
 	"fmt"
 	"html/template"
 	"net/http"
 	"os"
+
+	"asciiart/ascii"
 )
 
 type Ascii struct {
 	Result string
+	Style  string
 }
 
 func main() {
-	http.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir("assets"))))
+	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 	http.HandleFunc("/", homeHandler)
 	http.HandleFunc("/ascii-art", asciiArtHandler)
+
+	fmt.Println("Starting the Server at port 8080")
 	http.ListenAndServe(":8080", nil)
 }
 
@@ -39,7 +43,7 @@ func asciiArtHandler(w http.ResponseWriter, r *http.Request) {
 		text := r.FormValue("text")
 		banner := r.FormValue("banner")
 		result := generateAsciiArt(text, banner)
-		t, err := template.ParseFiles("result.html")
+		t, err := template.ParseFiles("index.html")
 		if err != nil {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			return
@@ -54,7 +58,6 @@ func asciiArtHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func generateAsciiArt(text, banner string) string {
-
 	// Create a map of each printable Ascii rune to art
 	runeAsciiArtMap, err := ascii.RuneAsciiArtMapCreator("./banners/" + banner + ".txt")
 	if err != nil {

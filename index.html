@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>Ascii Art Web</title>
-  <link rel="stylesheet" href="/assets/style.css">
+  <link rel="stylesheet" href="/static/style.css">
   <style>
     pre{margin-top: 80px;}
   </style>
@@ -30,9 +30,11 @@
           <option value="thinkertoy">Thinkertoy</option>
         </select>
         <button type="submit">Convert to ASCII Art</button>
-        <pre style="color:red; overflow: auto;"><p>{{.Result}}</p></pre>
       </form>
     </header>
+    <article>
+      <pre style="overflow: auto;"><h1>{{.Result}}</h1></pre>
+    </article>
   </main>
 </body>
 </html>

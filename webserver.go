@@ -11,7 +11,6 @@ import (
 
 type Ascii struct {
 	Result string
-	Style  string
 }
 
 func main() {
@@ -41,6 +40,9 @@ func asciiArtHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("Received request to %s", r.URL.Path)
 	if r.Method == http.MethodPost {
 		text := r.FormValue("text")
+		// if strings.Contains(text, "\r\n") {
+		// 	text = strings.ReplaceAll(text, "\r\n", "\n")
+		// }
 		banner := r.FormValue("banner")
 		result := generateAsciiArt(text, banner)
 		t, err := template.ParseFiles("index.html")

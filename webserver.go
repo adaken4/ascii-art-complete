@@ -5,6 +5,7 @@ import (
 	"html/template"
 	"net/http"
 	"os"
+	"strings"
 
 	"asciiart/ascii"
 )
@@ -40,12 +41,12 @@ func asciiArtHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("Received request to %s", r.URL.Path)
 	if r.Method == http.MethodPost {
 		text := r.FormValue("text")
-		// if strings.Contains(text, "\r\n") {
-		// 	text = strings.ReplaceAll(text, "\r\n", "\n")
-		// }
+		if strings.Contains(text, "\r\n") {
+			text = strings.ReplaceAll(text, "\r\n", "\n")
+		}
 		banner := r.FormValue("banner")
 		result := generateAsciiArt(text, banner)
-		t, err := template.ParseFiles("index.html")
+		t, err := template.ParseFiles("result.html")
 		if err != nil {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			return

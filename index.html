@@ -4,21 +4,19 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>Ascii Art Web</title>
+  <title>Ascii Art Web Converter</title>
   <link rel="stylesheet" href="/static/style.css">
-  <style>
-    pre{margin-top: 80px;}
-  </style>
 </head>
 <body>
   <main>
     <header>
-      <a href="/">Ascii Art Web</a>
+      <a href="/">Ascii Art Web Converter</a>
     </header>
       <form action="/ascii-art" method="POST">
         <div>
           <label for="input">Enter Input Text:</label>
-          <textarea id="input" name="text">Hello World!</textarea>
+          <textarea id="input" name="text" placeholder="Enter text to convert to ASCII Art"></textarea>
+
         </div>
         <div>
           <label for="banner">Select Banner File:</label>
@@ -31,9 +29,6 @@
         </div>
         <button type="submit">Convert to ASCII Art</button>
       </form>
-    <article>
-      <pre><p>{{.Result}}</p></pre>
-    </article>
   </main>
 </body>
 </html>

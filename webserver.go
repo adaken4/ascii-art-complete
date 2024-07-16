@@ -15,16 +15,27 @@ type Ascii struct {
 }
 
 func main() {
-	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
-	http.HandleFunc("/", homeHandler)
-	http.HandleFunc("/ascii-art", asciiArtHandler)
+	mux := http.NewServeMux()
+	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
+	mux.HandleFunc("/", homeHandler)
+	mux.HandleFunc("/ascii-art", asciiArtHandler)
 
 	fmt.Println("Starting the Server at port 8080")
-	http.ListenAndServe(":8080", nil)
+	server := http.Server{
+		Addr:    "127.0.0.1:8080",
+		Handler: mux,
+	}
+	err := server.ListenAndServe()
+	if err != nil {
+		fmt.Println(err.Error())
+	}
 }
 
 func homeHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Printf("Received request to %s", r.URL.Path)
+	fmt.Printf("Received request to %s\n", r.URL.Path)
+	if r.URL.Path != "/" {
+		http.Error(w, "Bad Request", http.StatusBadRequest)
+	}
 	if r.Method == http.MethodGet {
 		t, err := template.ParseFiles("index.html")
 		if err != nil {
@@ -38,7 +49,10 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func asciiArtHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Printf("Received request to %s", r.URL.Path)
+	fmt.Printf("Received request to %s\n", r.URL.Path)
+	if r.URL.Path != "/ascii-art" {
+		http.Error(w, "Bad Request", http.StatusBadRequest)
+	}
 	if r.Method == http.MethodPost {
 		text := r.FormValue("text")
 		if strings.Contains(text, "\r\n") {

@@ -22,7 +22,7 @@ func main() {
 
 	fmt.Println("Starting the Server at port 8080")
 	server := http.Server{
-		Addr:    "127.0.0.1:8080",
+		Addr:    ":8080",
 		Handler: mux,
 	}
 	err := server.ListenAndServe()
@@ -34,7 +34,8 @@ func main() {
 func homeHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("Received request to %s\n", r.URL.Path)
 	if r.URL.Path != "/" {
-		http.Error(w, "Bad Request", http.StatusBadRequest)
+		http.Error(w, "Not Found", http.StatusNotFound)
+		return
 	}
 	if r.Method == http.MethodGet {
 		t, err := template.ParseFiles("index.html")
@@ -51,7 +52,8 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 func asciiArtHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("Received request to %s\n", r.URL.Path)
 	if r.URL.Path != "/ascii-art" {
-		http.Error(w, "Bad Request", http.StatusBadRequest)
+		http.Error(w, "Not Found", http.StatusNotFound)
+		return
 	}
 	if r.Method == http.MethodPost {
 		text := r.FormValue("text")

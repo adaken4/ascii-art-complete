@@ -15,6 +15,9 @@ type Ascii struct {
 }
 
 func main() {
+	if len(os.Args) != 1 {
+		return
+	}
 	mux := http.NewServeMux()
 	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 	mux.HandleFunc("/", homeHandler)

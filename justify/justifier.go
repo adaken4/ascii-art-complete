@@ -1,7 +1,6 @@
 package justify
 
 import (
-	"fmt"
 	"strings"
 )
 
@@ -18,9 +17,10 @@ func ArtAligner(position, artText string) (string, error) {
 	}
 	// Split artText into lines
 	lines := strings.Split(artText, "\n")
+	lines = lines[:len(lines)-1]
 
 	spaceIndexes := SpaceIndexes(lines[3], "      ")
-	fmt.Println(spaceIndexes)
+	// fmt.Println(spaceIndexes)
 
 	// Define the padding
 	var paddedLines []string
@@ -42,14 +42,36 @@ func ArtAligner(position, artText string) (string, error) {
 			paddedLine := strings.Repeat(" ", padding) + line
 			paddedLines = append(paddedLines, paddedLine)
 		case "justify":
+			// spaceIndexes := SpaceIndexes(line, "      ") // Assuming 6 spaces for ASCII art
+			numSpaces := len(spaceIndexes)
+			// fmt.Println(numSpaces)
 
-			padding = (terminalWidth - textWidth) / len(spaceIndexes)
-			// fmt.Println(len(line))
-			paddedLine := line[:spaceIndexes[0]] + strings.Repeat(" ", padding) + line[spaceIndexes[0]+6:]
-			fmt.Println(paddedLine)
-			paddedLines = append(paddedLines, paddedLine)
-			// TODO
-			// each space padding / no.of spaces
+			if numSpaces > 0 {
+				totalSpaces := terminalWidth - textWidth
+				spacesPerGap := totalSpaces / numSpaces
+				extraSpaces := totalSpaces % numSpaces
+
+				var paddedLine strings.Builder
+				lastIndex := 0
+
+				for i, index := range spaceIndexes {
+					paddedLine.WriteString(line[lastIndex:index])
+					numSpacesToAdd := spacesPerGap
+					if i < extraSpaces {
+						numSpacesToAdd++
+					}
+					paddedLine.WriteString(strings.Repeat(" ", numSpacesToAdd))
+					lastIndex = index
+				}
+
+				// Append the remaining part of the line
+				paddedLine.WriteString(line[lastIndex:])
+
+				paddedLines = append(paddedLines, paddedLine.String())
+			} else {
+				// If no spaces found, left-align the line
+				paddedLines = append(paddedLines, line)
+			}
 
 		}
 	}

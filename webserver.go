@@ -34,25 +34,25 @@ func main() {
 func homeHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("Received request to %s\n", r.URL.Path)
 	if r.URL.Path != "/" {
-		http.Error(w, "Not Found", http.StatusNotFound)
+		renderError(w, http.StatusNotFound, "Page Not Found")
 		return
 	}
 	if r.Method == http.MethodGet {
 		t, err := template.ParseFiles("index.html")
 		if err != nil {
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			renderError(w, http.StatusInternalServerError, "Internal Server Error")
 			return
 		}
 		t.Execute(w, nil)
 	} else {
-		http.Error(w, "Bad Request", http.StatusBadRequest)
+		renderError(w, http.StatusBadRequest, "Bad Request")
 	}
 }
 
 func asciiArtHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("Received request to %s\n", r.URL.Path)
 	if r.URL.Path != "/ascii-art" {
-		http.Error(w, "Not Found", http.StatusNotFound)
+		renderError(w, http.StatusNotFound, "Not Found")
 		return
 	}
 	if r.Method == http.MethodPost {
@@ -64,7 +64,7 @@ func asciiArtHandler(w http.ResponseWriter, r *http.Request) {
 		result := generateAsciiArt(text, banner)
 		t, err := template.ParseFiles("result.html")
 		if err != nil {
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			renderError(w, http.StatusInternalServerError, "Internal Server Error")
 			return
 		}
 		ascii := Ascii{
@@ -72,8 +72,38 @@ func asciiArtHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		t.Execute(w, ascii)
 	} else {
-		http.Error(w, "Bad Request", http.StatusBadRequest)
+		renderError(w, http.StatusBadRequest, "Bad Request")
 	}
+}
+
+func renderError(w http.ResponseWriter, status int, message string) {
+	w.WriteHeader(status)
+	var templateFile string
+	switch status {
+	case http.StatusBadRequest:
+		templateFile = "400.html"
+	case http.StatusNotFound:
+		templateFile = "404.html"
+	case http.StatusInternalServerError:
+		templateFile = "500.html"
+	default:
+		http.Error(w, message, status)
+		return
+	}
+
+	t, err := template.ParseFiles(templateFile)
+	if err != nil {
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	data := struct {
+		Message string
+	}{
+		Message: message,
+	}
+
+	t.Execute(w, data)
 }
 
 func generateAsciiArt(text, banner string) string {

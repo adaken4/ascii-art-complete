@@ -43,7 +43,7 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet {
 		t, err := template.ParseFiles("index.html")
 		if err != nil {
-			renderError(w, http.StatusInternalServerError, "Internal Server Error")
+			renderError(w, http.StatusNotFound, err.Error())
 			return
 		}
 		t.Execute(w, nil)
@@ -64,7 +64,11 @@ func asciiArtHandler(w http.ResponseWriter, r *http.Request) {
 			text = strings.ReplaceAll(text, "\r\n", "\n")
 		}
 		banner := r.FormValue("banner")
-		result := generateAsciiArt(text, banner)
+		result, err := generateAsciiArt(text, banner)
+		if err != nil {
+			renderError(w, http.StatusNotFound, err.Error())
+			return
+		}
 		t, err := template.ParseFiles("result.html")
 		if err != nil {
 			renderError(w, http.StatusInternalServerError, "Internal Server Error")
@@ -109,12 +113,12 @@ func renderError(w http.ResponseWriter, status int, message string) {
 	t.Execute(w, data)
 }
 
-func generateAsciiArt(text, banner string) string {
+func generateAsciiArt(text, banner string) (string, error) {
 	// Create a map of each printable Ascii rune to art
 	runeAsciiArtMap, err := ascii.RuneAsciiArtMapCreator("./banners/" + banner + ".txt")
 	if err != nil {
-		os.Stderr.WriteString(err.Error() + "\n")
-		os.Exit(1)
+		fmt.Printf(err.Error())
+		return "", err
 	}
 
 	// Define parameters for Ascii art retrieval
@@ -128,10 +132,9 @@ func generateAsciiArt(text, banner string) string {
 	// Build art representation of the input text
 	artText, err := ascii.ArtStringBuilder(params)
 	if err != nil {
-		os.Stderr.WriteString(err.Error() + "\n")
-		os.Exit(1)
+		return "", err
 	}
 	// Implement the logic to generate ASCII art based on the text and banner
 	// This is a placeholder for the actual implementation
-	return artText
+	return artText, nil
 }

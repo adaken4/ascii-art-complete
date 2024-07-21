@@ -1,6 +1,7 @@
 package justify
 
 import (
+	"fmt"
 	"strings"
 )
 
@@ -19,8 +20,13 @@ func ArtAligner(position, artText string) (string, error) {
 	lines := strings.Split(artText, "\n")
 	lines = lines[:len(lines)-1]
 
-	spaceIndexes := SpaceIndexes(lines[3], "      ")
-	// fmt.Println(spaceIndexes)
+	allSpaceIndexes := [][]int{}
+	for i := 3; i < 6; i++ {
+		allSpaceIndexes = append(allSpaceIndexes, SpaceIndexes(lines[i], "      "))
+	}
+	spaceIndexes := findFurthestIndexes(allSpaceIndexes)
+	fmt.Println(spaceIndexes)
+	fmt.Println(allSpaceIndexes)
 
 	// Define the padding
 	var paddedLines []string
@@ -85,6 +91,23 @@ func ArtAligner(position, artText string) (string, error) {
 		}
 	}
 	return result.String(), nil
+}
+
+// findFurthestIndexes finds the furthest indexes in the provided 2D slice
+func findFurthestIndexes(indexes [][]int) []int {
+	if len(indexes) == 0 {
+		return nil
+	}
+
+	maxIndexes := make([]int, len(indexes[0]))
+	for _, indexList := range indexes {
+		for i, index := range indexList {
+			if index > maxIndexes[i] {
+				maxIndexes[i] = index
+			}
+		}
+	}
+	return maxIndexes
 }
 
 func SpaceIndexes(line, spaces string) []int {

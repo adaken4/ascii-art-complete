@@ -11,7 +11,6 @@ import (
 )
 
 func main() {
-
 	// Get terminal flag options and arguments
 	options, err := flags.ParseOptions()
 	if err != nil {
@@ -39,19 +38,21 @@ func main() {
 		AsciiArtMap: runeAsciiArtMap,
 	}
 
+	// Align art representation if specified
+	if options.Align != "" {
+		artText, err := justify.ArtAligner(options.Align, params)
+		if err != nil {
+			os.Stderr.WriteString(err.Error() + "\n")
+		}
+		fmt.Print(artText)
+		return
+	}
+
 	// Build art representation of the input text
 	artText, err := ascii.ArtStringBuilder(params)
 	if err != nil {
 		os.Stderr.WriteString(err.Error() + "\n")
 		os.Exit(1)
-	}
-
-	// Align art representation if specified
-	if options.Align != "" {
-		artText, err = justify.ArtAligner(options.Align, artText)
-		if err != nil {
-			os.Stderr.WriteString(err.Error() + "\n")
-		}
 	}
 
 	// Output art representation to a file if provided

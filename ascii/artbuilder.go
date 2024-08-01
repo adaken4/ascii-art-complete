@@ -93,40 +93,41 @@ func StringBuilder(params ArtParams) (string, error) {
 	return result.String(), nil
 }
 
-// processNormal processes the input text normally, optionally colorizing each character.
+// processNormal processes the input text normally, optionally colorizing each character
 func processNormal(params ArtParams, lineIndex int) (string, error) {
-	var result strings.Builder
-	ansiCode, err := color.SetColor(params.Colour)
-	if err != nil {
-		return "", err
-	}
-	for _, v := range params.InputText {
-		artLines := strings.Split(params.AsciiArtMap[v], "\n")
-		result.WriteString(artLines[lineIndex])
-	}
-	if params.Colour != "" {
-		return color.Colorize(ansiCode, result.String()), nil
-	}
-	return result.String(), nil
+	return processText(params, lineIndex, false)
 }
 
 // colorizeSubstring colorizes the specified substring.
 func colorizeSubstring(params ArtParams, lineIndex int) (string, error) {
-	var result strings.Builder
-	ansiCode, err := color.SetColor(params.Colour)
-	if err != nil {
-		return "", err
-	}
-	for _, v := range params.SubString {
-		artLines := strings.Split(params.AsciiArtMap[v], "\n")
-
-		result.WriteString(artLines[lineIndex])
-	}
-	return color.Colorize(ansiCode, result.String()), nil
+	return processText(params, lineIndex, true)
 }
 
 // processCharacter processes a single character, adding its ASCII art lines.
 func processCharacter(char rune, asciiArtMap map[rune]string, lineIndex int) string {
 	artLines := strings.Split(asciiArtMap[char], "\n")
 	return artLines[lineIndex]
+}
+
+// processText processes the input text, optionally colorizing it.
+func processText(params ArtParams, lineIndex int, isSubstring bool) (string, error) {
+	var result strings.Builder
+	text := params.InputText
+	if isSubstring {
+		text = params.SubString
+	}
+
+	for _, v := range text {
+		artLines := strings.Split(params.AsciiArtMap[v], "\n")
+		result.WriteString(artLines[lineIndex])
+	}
+
+	if params.Colour != "" {
+		ansiCode, err := color.SetColor(params.Colour)
+		if err != nil {
+			return "", err
+		}
+		return color.Colorize(ansiCode, result.String()), nil
+	}
+	return result.String(), nil
 }

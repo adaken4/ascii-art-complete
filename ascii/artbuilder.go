@@ -96,17 +96,16 @@ func StringBuilder(params ArtParams) (string, error) {
 // processNormal processes the input text normally, optionally colorizing each character.
 func processNormal(params ArtParams, lineIndex int) (string, error) {
 	var result strings.Builder
+	ansiCode, err := color.SetColor(params.Colour)
+	if err != nil {
+		return "", err
+	}
 	for _, v := range params.InputText {
 		artLines := strings.Split(params.AsciiArtMap[v], "\n")
-		if params.Colour != "" {
-			ansiCode, err := color.SetColor(params.Colour)
-			if err != nil {
-				return "", err
-			}
-			result.WriteString(color.Colorize(ansiCode, artLines[lineIndex]))
-		} else {
-			result.WriteString(artLines[lineIndex])
-		}
+		result.WriteString(artLines[lineIndex])
+	}
+	if params.Colour != "" {
+		return color.Colorize(ansiCode, result.String()), nil
 	}
 	return result.String(), nil
 }
@@ -114,15 +113,16 @@ func processNormal(params ArtParams, lineIndex int) (string, error) {
 // colorizeSubstring colorizes the specified substring.
 func colorizeSubstring(params ArtParams, lineIndex int) (string, error) {
 	var result strings.Builder
+	ansiCode, err := color.SetColor(params.Colour)
+	if err != nil {
+		return "", err
+	}
 	for _, v := range params.SubString {
 		artLines := strings.Split(params.AsciiArtMap[v], "\n")
-		ansiCode, err := color.SetColor(params.Colour)
-		if err != nil {
-			return "", err
-		}
-		result.WriteString(color.Colorize(ansiCode, artLines[lineIndex]))
+
+		result.WriteString(artLines[lineIndex])
 	}
-	return result.String(), nil
+	return color.Colorize(ansiCode, result.String()), nil
 }
 
 // processCharacter processes a single character, adding its ASCII art lines.

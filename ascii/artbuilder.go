@@ -82,7 +82,7 @@ func StringBuilder(params ArtParams) (string, error) {
 				result.WriteString(coloredSubstring)
 				start += len(params.SubString)
 			} else {
-				result.WriteString(processCharacter(rune(params.InputText[start]), params.AsciiArtMap, i))
+				result.WriteString(ProcessCharacter(rune(params.InputText[start]), params.AsciiArtMap, i))
 				start++
 			}
 		}
@@ -104,7 +104,7 @@ func colorizeSubstring(params ArtParams, lineIndex int) (string, error) {
 }
 
 // processCharacter processes a single character, adding its ASCII art lines.
-func processCharacter(char rune, asciiArtMap map[rune]string, lineIndex int) string {
+func ProcessCharacter(char rune, asciiArtMap map[rune]string, lineIndex int) string {
 	artLines := strings.Split(asciiArtMap[char], "\n")
 	return artLines[lineIndex]
 }

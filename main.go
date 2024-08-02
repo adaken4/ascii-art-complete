@@ -43,6 +43,7 @@ func main() {
 		artText, err := justify.ArtAligner(options.Align, params)
 		if err != nil {
 			os.Stderr.WriteString(err.Error() + "\n")
+			return
 		}
 		fmt.Print(artText)
 		return

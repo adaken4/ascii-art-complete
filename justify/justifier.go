@@ -52,6 +52,7 @@ func ArtAligner(position string, params ascii.ArtParams) (string, error) {
 	case "justify":
 		ansiCode, _ := color.SetColor(params.Colour)
 		inputTextLines := strings.Split(params.InputText, "\n")
+		differentParams.SubString = params.SubString
 		for _, line := range inputTextLines {
 			// Count spaces in params.InputText
 			differentParams.InputText = line
@@ -73,7 +74,11 @@ func ArtAligner(position string, params ascii.ArtParams) (string, error) {
 
 			for i := 0; i < 8; i++ {
 				for start := 0; start < len(differentParams.InputText); start++ {
-					if strings.HasPrefix(differentParams.InputText[start:], " ") {
+					if strings.HasPrefix(differentParams.InputText[start:], params.SubString) {
+						coloredSubstring, _ := ascii.ColorizeSubstring(differentParams, i)
+						paddedLine += coloredSubstring
+						start += len(params.SubString) // Move the start index past the substring
+					} else if strings.HasPrefix(differentParams.InputText[start:], " ") {
 						paddedLine += strings.Repeat(" ", padding) + "      "
 
 					} else {

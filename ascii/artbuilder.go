@@ -75,7 +75,7 @@ func StringBuilder(params ArtParams) (string, error) {
 				result.WriteString(normalString)
 				break
 			} else if strings.HasPrefix(params.InputText[start:], params.SubString) {
-				coloredSubstring, err := colorizeSubstring(params, i)
+				coloredSubstring, err := ColorizeSubstring(params, i)
 				if err != nil {
 					return "", err
 				}
@@ -99,7 +99,7 @@ func processNormal(params ArtParams, lineIndex int) (string, error) {
 }
 
 // colorizeSubstring colorizes the specified substring.
-func colorizeSubstring(params ArtParams, lineIndex int) (string, error) {
+func ColorizeSubstring(params ArtParams, lineIndex int) (string, error) {
 	return processText(params, lineIndex, true)
 }
 
